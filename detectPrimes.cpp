@@ -61,12 +61,12 @@ void is_prime(int64_t threadId)
 
   for (int64_t i = start; i < finish; i += 6)
   {
-    if (!prime_number)
+    if (!prime_number) // not a prime number, cancel thread.
     {
       pthread_cancel(pthread_self());
     }
 
-    if (i <= max)
+    if (i <= max) // checks whether value is in range
     {
       if (num % i == 0)
       {
@@ -86,6 +86,9 @@ void is_prime(int64_t threadId)
   return;
 }
 
+/* takes care of the barrier and distribution of values per thread. Also checks when the threads are done
+*  if not, keep checking for prime values.
+*/
 void *threadTask(void *taskId)
 {
   int64_t tid = (intptr_t)taskId;
