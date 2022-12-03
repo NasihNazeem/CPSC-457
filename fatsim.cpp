@@ -12,24 +12,6 @@
 #include <stack>
 #include <vector>
 
-long DFS(std::vector<std::vector<long>> & adj_list, long start)
-{
-  long maxDepth = 1;
-  std::vector<std::pair<long, long>> stack;
-  stack.push_back(std::make_pair(start, 1));
-  while (! stack.empty()) {
-    long node = stack.back().first;
-    long depth = stack.back().second;
-    stack.pop_back();
-    if (adj_list.at(node).empty() && maxDepth < depth) {
-      maxDepth = depth;
-      continue;
-    }
-    for (auto & elem : adj_list.at(node)) { stack.push_back(std::make_pair(elem, depth + 1)); }
-  }
-  return maxDepth;
-}
-
 std::vector<long> fat_check(const std::vector<long> & fat)
 {
   std::vector<std::vector<long>> adj_list;
@@ -50,12 +32,32 @@ std::vector<long> fat_check(const std::vector<long> & fat)
   }
 
   std::stack<std::pair<long, long>> stack;
+  long currentChain, longestChain, currentNode, longestNode;
+  longestChain = 0;
+  longestNode = 0;
 
-  long counter = 0;
+  for (long endpoint : endpoints) {
 
-  for (auto & elem : fat) {
-    if (elem == -1) { result.push_back(DFS(adj_list, counter)); }
-    counter++;
+    stack.emplace(endpoint, 1);
+
+    // While stack is not empty, perform DFS on each point and record longest chain
+    while (stack.size() > 1) {
+      currentNode = stack.top().first;
+      currentChain = stack.top().second;
+      printf("current node is: %ld\n\n", currentNode);
+      printf("current chain is: %ld\n\n", currentChain);
+      std::cout << std::endl;
+      stack.pop();
+
+      if (currentChain >= longestChain) {
+        longestChain = currentChain;
+        longestNode = currentNode;
+      }
+
+      for (auto n : adj_list[currentNode]) { stack.emplace(n, currentChain + 1); }
+    }
+    std::cout << "longChain: " << longestChain << std::endl << std::endl << std::endl;
+    if (longestChain > 0) { result.push_back(longestNode); }
   }
 
   std::sort(result.begin(), result.end());
